@@ -280,17 +280,7 @@ namespace Tera {
 
                 auto mesh = GenerateTwoTrianglesMesh(grid, hf);
                 
-                std::vector<Vertex> grassBladeVerts = {
-                    {{0.0f, 0.0f, 0.0f},  {0,1,0}, {0.1f, 0.8f, 0.1f}},
-                    {{0.1f, 0.5f, 0.0f},  {0,1,0}, {0.2f, 0.9f, 0.2f}},
-                    {{-0.1f, 0.5f, 0.0f}, {0,1,0}, {0.2f, 0.9f, 0.2f}},
-                };
-                std::vector<unsigned int> grassBladeIndices = { 0, 1, 2 };
-
-                Object grassBlade(grassBladeVerts, grassBladeIndices);
-                auto terrain = ScatterObjects(grassBlade, *mesh, 1.0f, .5f, 0.0f);
-                
-                objects.push_back(std::move(terrain));
+                objects.push_back(std::move(mesh));
             }
         }
     }

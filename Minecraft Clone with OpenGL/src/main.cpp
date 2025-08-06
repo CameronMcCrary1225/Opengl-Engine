@@ -6,13 +6,8 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "Shader.h"
-#include "Camera.h"
-#include "Object.h"
-#include "Nodes.h"
-#include "Importing.h"
-#include "DataHandler.h"
 #include <chrono>
+#include "ALLHeaders.h"
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -41,49 +36,7 @@ int main() {
 
     // Objects (unique_ptr avoids shallow copies)
     std::vector<std::unique_ptr<Object>> objlist;
-    //objlist.emplace_back(std::make_unique<Object>(PrimitiveType::Sphere, 36));
-    //objlist.emplace_back(std::make_unique<Object>(PrimitiveType::Plane, 100));
-    //objlist.emplace_back(std::make_unique<Object>(PrimitiveType::Cube, 20));
-    //std::cout << "objlist size: " << objlist.size() << std::endl;
-
-    //Object prototypeCube(PrimitiveType::Cube, 50);
-    
-    /*
-    objlist.emplace_back(std::make_unique<Object>(PrimitiveType::Plane, 500));
-    objlist.emplace_back(std::make_unique<Object>(PrimitiveType::Sphere, 100));
-
-    Object prototypeCube(PrimitiveType::Sphere, 5);
-    
-    auto cubearray = ArrayNodeObjects(prototypeCube, 50, 50);
-    //WhiteNoise(cubearray, 25, 25, 1, 5);
-    //ValueNoise(cubearray, 50, 50, 1, 2);
-    PerlinNoise(cubearray, 50, 50, 1, 5);
-    GenerateTwoTrianglesMesh(cubearray, 50, 50);
-    //MinecraftNode(cubearray, 1);
-    //cubearray = FillColumns(cubearray, 25, 25, 2, 1);
-    //std::cout << cubearray.size() << std::endl;
-
-    for (auto& o : cubearray) objlist.push_back(std::move(o));
-    
-    
-    OBJModel model;
-    if (!model.load("res/Models/objtest.txt")) {
-        std::cerr << "ERROR: FAILED TO LOAD OBJ\n";
-        return -1;
-    }
-    auto mesh = model.buildObject();
-    if (!mesh) {
-        std::cerr << "ERROR: buildObject() returned null\n";
-        return -1;
-    }
-
-
-    objlist.push_back(std::move(mesh));
-    */
-    //auto grid = Tera::make_grid(0, 0, 200, 200, 100.0f);
-    //auto noise = Tera::noise2d(grid, 0.1f, 42);
-    //auto hf = Tera::make_heightfield(grid.nx, grid.nz, noise, 1.0f);
-    //objlist.emplace_back(Tera::GenerateTwoTrianglesMesh(grid, hf));
+   
     int chunkSize = 10;
     int centerCx = static_cast<int>(camera.Position.x / chunkSize);
     int centerCy = static_cast<int>(camera.Position.y / chunkSize);
@@ -94,11 +47,6 @@ int main() {
     auto lastTime = std::chrono::high_resolution_clock::now();
     int frames = 0;
     size_t totalVerts = 0;
-    for (const auto& obj : objlist) {
-        totalVerts += obj->getIndexCount() / 3; // Assuming triangles (3 indices per vertex)
-    }
-    std::cout << "Total visible vertices: " << totalVerts << std::endl;
-    // Render loop
     while (!glfwWindowShouldClose(window)) {
         // Time
         float currentFrame = glfwGetTime();
@@ -156,6 +104,8 @@ int main() {
             ourShader.setMat4("model", obj->modelMatrix);
             obj->Draw();
         }
+
+        //genereate framerate to consol
         frames++;
         auto currentTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> elapsed = currentTime - lastTime;
@@ -165,38 +115,6 @@ int main() {
             frames = 0;
             lastTime = currentTime;
         }
-        // Draw each object with its own model matrix
-        /*
-        for (size_t i = 0; i < objlist.size(); ++i) {
-            glm::mat4 model = glm::mat4(1.0f);
-
-            // Base translation: spread on X and push back on Z
-            model = glm::translate(
-                model,
-                glm::vec3((float)i * 2.0f - 1.0f, 0.0f, -5.0f)
-            );
-
-            // Apply node operations
-            if (i == 1) {
-                // For the plane (second object), move up by 5
-                translateModel(model, glm::vec3(0.0f, 5.0f, 0.0f));
-                
-            }
-            if (i == 2) {
-                // For the cube (third object), scale it by 2x
-                scaleModel(model, 2.0f);
-                translateModel(model, glm::vec3(0.0f, 10.0f, 0.0f));
-            }
-
-            // Optional rotation for all
-            //rotateModel(model, currentFrame, glm::vec3(0.5f, 1.0f, 0.0f));
-
-            // Set uniforms BEFORE draw
-            ourShader.setMat4("model", model);
-
-            // Draw
-            objlist[i]->Draw();
-        }*/
 
         // Swap & poll
         glfwSwapBuffers(window);

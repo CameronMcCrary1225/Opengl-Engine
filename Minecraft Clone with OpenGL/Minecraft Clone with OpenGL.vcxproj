@@ -22,7 +22,6 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Importing.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Nodes.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Shader.cpp" />
   </ItemGroup>
@@ -31,10 +30,10 @@
     <None Include="res\shader\shader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ALLHeaders.h" />
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\DataHandler.h" />
+    <ClInclude Include="src\Tera.h" />
     <ClInclude Include="src\Importing.h" />
-    <ClInclude Include="src\Nodes.h" />
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Vertex.h" />

@@ -27,9 +27,6 @@
     <ClCompile Include="src\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Nodes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Importing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,16 +45,16 @@
     <ClInclude Include="src\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Nodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Importing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataHandler.h">
+    <ClInclude Include="src\Tera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ALLHeaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
