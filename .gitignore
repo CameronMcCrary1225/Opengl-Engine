@@ -1,0 +1,16 @@
+# Visual Studio stuff
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+*.obj
+*.exe
+*.pdb
+Debug/
+Release/
+x64/
+bin/
+obj/
+*.log
+*.cache
