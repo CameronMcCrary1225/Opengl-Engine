@@ -25,7 +25,9 @@ public:
     void setMat4(const std::string& name, const glm::mat4& mat) const;
     void setVec3(const std::string& name, float x, float y, float z) const;  // ? changed
     void setVec3(const std::string& name, const glm::vec3& v) const;
-
+    void setVec2(const std::string& name, const glm::vec2& value) const {
+        glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    }
 private:
     // Helper function to load shader code from file
     std::string loadShaderSource(const char* path);

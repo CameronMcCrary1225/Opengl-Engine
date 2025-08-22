@@ -26,6 +26,8 @@
     <ClCompile Include="src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shader\grass.frag" />
+    <None Include="res\shader\grass.vert" />
     <None Include="res\shader\shader.frag" />
     <None Include="res\shader\shader.vert" />
   </ItemGroup>

@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <numeric>
 #include <random>
+extern Shader grassShader;
+
 namespace Tera {
 
 	struct GridPoints {
@@ -264,8 +266,28 @@ namespace Tera {
         // Return merged scattered mesh
         return std::make_unique<Object>(verts, inds);
     }
+    inline GLuint CreateHeightMapTexture(const HeightField& hf, int nx, int nz) {
+        GLuint tex;
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_R32F,
+            nx, nz,
+            0,
+            GL_RED,
+            GL_FLOAT,
+            hf.heights.data()
+        );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        return tex;
+    }
 
-    inline void Chunks(std::vector<std::unique_ptr<Object>>& objects, int centerCx, int centerCz, int radius, int nx, int nz, float chunkSize, float frequency, float amplitude, int seed, int octaves, float persistence) {
+    inline void Chunks(std::vector<std::unique_ptr<Object>>& objects, int centerCx, int centerCz, int radius, int nx, int nz, float chunkSize, float frequency, float amplitude, int seed, int octaves, float persistence, Shader grassShader, std::vector<GLuint>& outHeightTextures, std::vector<glm::vec2>& outChunkOrigins) {
         for (int dz = -radius; dz <= radius; ++dz) {
             for (int dx = -radius; dx <= radius; ++dx) {
                 int cx = centerCx + dx;
@@ -277,7 +299,11 @@ namespace Tera {
                 
 
                 HeightField hf = make_heightfield(nx, nz, raw, amplitude);
-
+                GLuint heightTex = Tera::CreateHeightMapTexture(hf, nx, nz);
+                //Tera::BindHeightMapUniforms(grassShader,heightTex,0,chunkSize,nx, nz,amplitude,glm::vec2(cx * chunkSize, cz * chunkSize));
+                outHeightTextures.push_back(heightTex);
+                outChunkOrigins.emplace_back(cx * chunkSize, cz * chunkSize);
+                
                 auto mesh = GenerateTwoTrianglesMesh(grid, hf);
                 
                 objects.push_back(std::move(mesh));

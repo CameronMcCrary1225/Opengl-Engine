@@ -39,6 +39,12 @@ public:
 
     unsigned int getIndexCount() const { return indexCount; }
 
+    void DrawInstanced(GLsizei instanceCount) const {
+        glBindVertexArray(VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0, instanceCount);
+        glBindVertexArray(0);
+    }
+
 private:
     unsigned int VAO, VBO, EBO;
     unsigned int indexCount;

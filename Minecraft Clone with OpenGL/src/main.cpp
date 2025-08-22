@@ -33,6 +33,21 @@ int main() {
 
     // Shader
     Shader ourShader("res/shader/shader.vert", "res/shader/shader.frag");
+    Shader grassShader("res/shader/grass.vert", "res/shader/grass.frag");
+
+    // A simple vertical quad (2 triangles = 6 indices)
+    std::vector<Vertex> bladeVerts = {
+        // pos            // normal       // color
+        {{-0.05f, 0.0f,0},{0,1,0},{0.1f,0.8f,0.1f}},
+        {{ 0.05f, 0.0f,0},{0,1,0},{0.1f,0.8f,0.1f}},
+        {{-0.05f, 1.0f,0},{0,1,0},{0.1f,0.8f,0.1f}},
+        {{ 0.05f, 1.0f,0},{0,1,0},{0.1f,0.8f,0.1f}},
+    };
+    std::vector<unsigned int> bladeInds = {
+        0,2,1,
+        1,2,3
+    };
+    auto grassBlade = std::make_unique<Object>(bladeVerts, bladeInds);
 
     // Objects (unique_ptr avoids shallow copies)
     std::vector<std::unique_ptr<Object>> objlist;
@@ -42,7 +57,9 @@ int main() {
     int centerCy = static_cast<int>(camera.Position.y / chunkSize);
 
     //Tera::Chunks(objlist, centerCx, centerCx, 2, 50, 50, 100.0f, .1f, 1.0f, 1, 8, 1);
-    Tera::Chunks(objlist, centerCx, centerCy, 2, 100, 100, 100.0f, .05f, 2.0f, 1, 4, .3);
+    std::vector<GLuint> chunkHeightTextures;
+    std::vector<glm::vec2> chunkOrigins;
+    Tera::Chunks(objlist, centerCx, centerCy, 2, 100, 100, 100.0f, .05f, 2.0f, 1, 4, .3, grassShader, chunkHeightTextures, chunkOrigins);
 
     auto lastTime = std::chrono::high_resolution_clock::now();
     int frames = 0;
@@ -73,7 +90,7 @@ int main() {
 
             // Generate new terrain centered around the player
             //Tera::Chunks(objlist, currentCx, currentCz, 2, 100, 100, 100.0f, .05f, 4.0f, 1, 8, .3);
-            Tera::Chunks(objlist, currentCx, currentCz, 2, 100, 100, 100.0f, .05f, 2.0f, 1, 4, .3);
+            Tera::Chunks(objlist, currentCx, currentCz, 2, 100, 100, 100.0f, .05f, 2.0f, 1, 4, .3, grassShader, chunkHeightTextures, chunkOrigins);
 
         }
         // Clear
@@ -104,7 +121,41 @@ int main() {
             ourShader.setMat4("model", obj->modelMatrix);
             obj->Draw();
         }
+        grassShader.use();
 
+        // reset all of the grass?shader uniforms for this frame
+        grassShader.setMat4("view", view);
+        grassShader.setMat4("projection", projection);
+        for (size_t i = 0; i < objlist.size(); ++i) {
+            GLuint heightTex = chunkHeightTextures[i];
+            glm::vec2 origin = chunkOrigins[i];
+
+            // debug-check: is the texture valid?
+            if (!glIsTexture(heightTex)) {
+                std::cerr << "Warning: invalid height texture at chunk " << i << "\n";
+                continue;
+            }
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, heightTex);
+            grassShader.setInt("heightMap", 0);
+
+            // set uniforms for this chunk
+            grassShader.setFloat("chunkSize", 100.0f); // or your variable
+            grassShader.setInt("gridWidth", 100);      // nx
+            grassShader.setInt("gridHeight", 100);     // nz
+            grassShader.setFloat("maxHeight", 2.0f);   // amplitude
+            grassShader.setVec2("chunkOrigin", origin);
+
+            GLsizei bladeCount = 100 * 100; // or nx * nz
+            grassBlade->DrawInstanced(bladeCount);
+
+            // optional: check GL error
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR) {
+                std::cerr << "GL error after binding/draw: " << std::hex << err << std::dec << "\n";
+            }
+        }
         //genereate framerate to consol
         frames++;
         auto currentTime = std::chrono::high_resolution_clock::now();
